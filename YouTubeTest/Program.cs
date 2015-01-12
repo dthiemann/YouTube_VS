@@ -13,12 +13,27 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 
 namespace YouTubeTest {
-    class Program {
+    internal class Program {
+        [STAThread]
         static void Main(string[] args) {
-            Console.WriteLine("Hello World");
+            Console.WriteLine("YouTubeData API: My Uploads");
+            Console.WriteLine("===========================");
+
+            try
+            {
+                new Program().Run().Wait();
+            }
+            catch (AggregateException ex)
+            {
+                foreach (var e in ex.InnerExceptions)
+                {
+                    Console.WriteLine("Error: " + e.Message);
+                }
+            }
+            Console.WriteLine("Press any key to continue...");
 
             //Closes the window when I hit 'Enter'
-            Console.Read();
+            Console.ReadKey();
         }
     }
 }
