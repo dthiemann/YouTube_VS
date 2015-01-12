@@ -15,6 +15,10 @@ using Google.Apis.YouTube.v3.Data;
 namespace YouTubeTest {
     class Program {
         static void Main(string[] args) {
+            Console.WriteLine("Hello World");
+
+            //Closes the window when I hit 'Enter'
+            Console.Read();
         }
     }
 }
