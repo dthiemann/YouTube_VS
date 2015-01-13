@@ -65,7 +65,20 @@ namespace YouTubeTest {
 
             foreach (var channel in channelsListResponse.Items)
             {
-                
+                // From the API response, extract the playlist ID that indentifies
+                // the list of videos uploaded to the authenticated user's channel
+                var uploadsListId = channel.ContentDetails.RelatedPlaylists.Uploads;
+
+                Console.WriteLine("Videos in list {0}", uploadsListId);
+
+                var nextPageToken = "";
+                while (nextPageToken != null)
+                {
+                    var playlistItemsListRequest = youtubeService.PlaylistItems.List("snippet");
+                    playlistItemsListRequest.PlaylistId = uploadsListId;
+                    playlistItemsListRequest.MaxResults = 50;
+                    playlistItemsListRequest.PageToken = nextPageToken;
+                }
             }
         }
     }
