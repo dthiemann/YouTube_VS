@@ -41,7 +41,7 @@ namespace YouTubeTest {
         private async Task Run()
         {
             UserCredential credential;
-            using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))
+            using (var stream = new FileStream("client_secret_test.json", FileMode.Open, FileAccess.Read))
             {
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
@@ -69,16 +69,29 @@ namespace YouTubeTest {
                 // the list of videos uploaded to the authenticated user's channel
                 var uploadsListId = channel.ContentDetails.RelatedPlaylists.Uploads;
 
-                Console.WriteLine("Videos in list {0}", uploadsListId);
+                Console.WriteLine("Videos in list {0}, {1}", uploadsListId, channel.ContentDetails.GooglePlusUserId);
 
                 var nextPageToken = "";
-                while (nextPageToken != null)
+                do
                 {
                     var playlistItemsListRequest = youtubeService.PlaylistItems.List("snippet");
                     playlistItemsListRequest.PlaylistId = uploadsListId;
                     playlistItemsListRequest.MaxResults = 50;
                     playlistItemsListRequest.PageToken = nextPageToken;
-                }
+
+                    // Retrieve the list of videos uploaded to hte authenticated user's channel.
+                    var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
+
+                    foreach (var playlistItem in playlistItemsListResponse.Items)
+                    {
+                        // Print information about each video
+                        Console.WriteLine("{0} ({1})", playlistItem.Snippet.Title,
+                            playlistItem.Snippet.ResourceId.VideoId);
+                    }
+
+                    nextPageToken = playlistItemsListResponse.NextPageToken;
+
+                } while (nextPageToken != null); 
             }
         }
     }
