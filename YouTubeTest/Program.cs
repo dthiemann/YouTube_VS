@@ -58,6 +58,7 @@ namespace YouTubeTest {
             });
 
             var channelsListRequest = youtubeService.Channels.List("contentDetails");
+            
             channelsListRequest.Mine = true;
 
             // Retrieve the conetnetDetails part of the channel resource for the authenticated user's channel
@@ -69,7 +70,7 @@ namespace YouTubeTest {
                 // the list of videos uploaded to the authenticated user's channel
                 var uploadsListId = channel.ContentDetails.RelatedPlaylists.Uploads;
 
-                Console.WriteLine("Videos in list {0}, {1}", uploadsListId, channel.ContentDetails.GooglePlusUserId);
+                Console.WriteLine("Videos in list {0}, {1}", uploadsListId, channel.ContentDetails.GooglePlusUserId.ToString());
 
                 var nextPageToken = "";
                 do
