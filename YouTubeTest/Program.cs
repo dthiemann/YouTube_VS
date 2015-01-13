@@ -15,84 +15,74 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 
 namespace YouTubeTest {
-    internal class Program {
+    internal class MyUploads {
         [STAThread]
         static void Main(string[] args) {
-            Console.WriteLine("YouTubeData API: My Uploads");
-            Console.WriteLine("===========================");
+            Console.WriteLine("YouTube Data API: My Uploads");
+            Console.WriteLine("============================");
 
-            try
-            {
-                new Program().Run().Wait();
+            try {
+                new MyUploads().Run().Wait();
             }
-            catch (AggregateException ex)
-            {
-                foreach (var e in ex.InnerExceptions)
-                {
+            catch (AggregateException ex) {
+                foreach (var e in ex.InnerExceptions) {
                     Console.WriteLine("Error: " + e.Message);
                 }
             }
-            Console.WriteLine("Press any key to continue...");
 
-            //Closes the window when I hit 'Enter'
+            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
 
-        private async Task Run()
-        {
+        private async Task Run() {
             UserCredential credential;
-            using (var stream = new FileStream("client_secret_test.json", FileMode.Open, FileAccess.Read))
-            {
+            using (var stream = new FileStream("client_secret_test.json", FileMode.Open, FileAccess.Read)) {
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
-                    new[] {YouTubeService.Scope.YoutubeReadonly},
+                    // This OAuth 2.0 access scope allows for read-only access to the authenticated 
+                    // user's account, but not other types of account access.
+                    new[] { YouTubeService.Scope.YoutubeReadonly },
                     "user",
                     CancellationToken.None,
-                    new FileDataStore(this.GetType().ToString()));
+                    new FileDataStore(this.GetType().ToString())
+                );
             }
 
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
-            {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
                 HttpClientInitializer = credential,
                 ApplicationName = this.GetType().ToString()
             });
 
             var channelsListRequest = youtubeService.Channels.List("contentDetails");
-            
             channelsListRequest.Mine = true;
 
-            // Retrieve the conetnetDetails part of the channel resource for the authenticated user's channel
+            // Retrieve the contentDetails part of the channel resource for the authenticated user's channel.
             var channelsListResponse = await channelsListRequest.ExecuteAsync();
 
-            foreach (var channel in channelsListResponse.Items)
-            {
-                // From the API response, extract the playlist ID that indentifies
-                // the list of videos uploaded to the authenticated user's channel
+            foreach (var channel in channelsListResponse.Items) {
+                // From the API response, extract the playlist ID that identifies the list
+                // of videos uploaded to the authenticated user's channel.
                 var uploadsListId = channel.ContentDetails.RelatedPlaylists.Uploads;
 
-                Console.WriteLine("Videos in list {0}, {1}", uploadsListId, channel.ContentDetails.GooglePlusUserId.ToString());
+                Console.WriteLine("Videos in list {0}", uploadsListId);
 
                 var nextPageToken = "";
-                do
-                {
+                while (nextPageToken != null) {
                     var playlistItemsListRequest = youtubeService.PlaylistItems.List("snippet");
                     playlistItemsListRequest.PlaylistId = uploadsListId;
                     playlistItemsListRequest.MaxResults = 50;
                     playlistItemsListRequest.PageToken = nextPageToken;
 
-                    // Retrieve the list of videos uploaded to hte authenticated user's channel.
+                    // Retrieve the list of videos uploaded to the authenticated user's channel.
                     var playlistItemsListResponse = await playlistItemsListRequest.ExecuteAsync();
 
-                    foreach (var playlistItem in playlistItemsListResponse.Items)
-                    {
-                        // Print information about each video
-                        Console.WriteLine("{0} ({1})", playlistItem.Snippet.Title,
-                            playlistItem.Snippet.ResourceId.VideoId);
+                    foreach (var playlistItem in playlistItemsListResponse.Items) {
+                        // Print information about each video.
+                        Console.WriteLine("{0} ({1})", playlistItem.Snippet.Title, playlistItem.Snippet.ResourceId.VideoId);
                     }
 
                     nextPageToken = playlistItemsListResponse.NextPageToken;
-
-                } while (nextPageToken != null); 
+                }
             }
         }
     }
