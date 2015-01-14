@@ -97,7 +97,7 @@ namespace YouTubeTest {
             });
 
             var searchListRequest = youtubeService.Search.List("snippet");
-            searchListRequest.Q = "Google"; // This is the search term
+            searchListRequest.Q = "Achievement Hunter"; // This is the search term
             searchListRequest.MaxResults = 50;
 
             //Call the search.list method to retrieve results matching specified query term
