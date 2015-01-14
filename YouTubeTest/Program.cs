@@ -22,7 +22,8 @@ namespace YouTubeTest {
             Console.WriteLine("============================");
 
             try {
-                new MyUploads().Run().Wait();
+                //new MyUploads().Uploads().Wait();
+                new MyUploads().Search().Wait();
             }
             catch (AggregateException ex) {
                 foreach (var e in ex.InnerExceptions) {
@@ -34,7 +35,7 @@ namespace YouTubeTest {
             Console.ReadKey();
         }
 
-        private async Task Run() {
+        private async Task Uploads() {
             UserCredential credential;
             using (var stream = new FileStream("client_secret_test.json", FileMode.Open, FileAccess.Read)) {
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
@@ -85,5 +86,48 @@ namespace YouTubeTest {
                 }
             }
         }
+
+        private async Task Search()
+        {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
+                // iOS ApiKey because I can't find how to do it with Window's Phones
+                ApiKey = "AIzaSyAj45pQlT6IRJlTmt8ykUUbZPhONmnwvgo",
+                ApplicationName = this.GetType().ToString()
+            });
+
+            var searchListRequest = youtubeService.Search.List("snippet");
+            searchListRequest.Q = "Google"; // This is the search term
+            searchListRequest.MaxResults = 50;
+
+            //Call the search.list method to retrieve results matching specified query term
+            var searchListResponse = await searchListRequest.ExecuteAsync();
+
+            List<string> videos = new List<string>();
+            List<string> channels = new List<string>();
+            List<string> playlists = new List<string>();
+
+            // Add each result to the appropriate list and then display the list of
+            // matching videos, channels, and playlists
+            foreach (var searchResult in searchListResponse.Items)
+            {
+                switch (searchResult.Id.Kind)
+                {
+                    case "youtube#video":
+                        videos.Add(String.Format("{0} ({1})", searchResult.Snippet.Title, searchResult.Id.VideoId));
+                        break;
+                    case "youtube#channel":
+                        channels.Add(String.Format("{0} ({1})", searchResult.Snippet.Title, searchResult.Id.ChannelId));
+                        break;
+                    case "youtube#playlist":
+                        playlists.Add(String.Format("{0} ({1})", searchResult.Snippet.Title, searchResult.Id.PlaylistId));
+                        break;
+                }
+            }
+            Console.WriteLine(String.Format("Videos:\n{0}\n", string.Join("\n", videos)));
+            Console.WriteLine(String.Format("Channels:\n{0}\n", string.Join("\n", channels)));
+            Console.WriteLine(String.Format("Playlists:\n{0}\n", string.Join("\n", playlists)));
+        }
     }
 }
+

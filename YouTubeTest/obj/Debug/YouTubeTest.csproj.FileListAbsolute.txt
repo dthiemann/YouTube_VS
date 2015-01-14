@@ -38,3 +38,4 @@ C:\Users\dylan_000\documents\visual studio 2013\Projects\YouTubeTest\YouTubeTest
 C:\Users\dylan_000\documents\visual studio 2013\Projects\YouTubeTest\YouTubeTest\obj\Debug\YouTubeTest.csproj.App.config
 C:\Users\dylan_000\documents\visual studio 2013\Projects\YouTubeTest\YouTubeTest\obj\Debug\YouTubeTest.exe
 C:\Users\dylan_000\documents\visual studio 2013\Projects\YouTubeTest\YouTubeTest\obj\Debug\YouTubeTest.pdb
+C:\Users\dylan_000\documents\visual studio 2013\Projects\YouTubeTest\YouTubeTest\obj\Debug\YouTubeTest.csprojResolveAssemblyReference.cache
